@@ -91,7 +91,7 @@ vim.g.mapleader = ' '
 vim.g.maplocalleader = ' '
 
 -- Set to true if you have a Nerd Font installed and selected in the terminal
-vim.g.have_nerd_font = false
+vim.g.have_nerd_font = true
 
 -- [[ Setting options ]]
 -- See `:help vim.o`
@@ -102,7 +102,7 @@ vim.g.have_nerd_font = false
 vim.o.number = true
 -- You can also add relative line numbers, to help with jumping.
 --  Experiment for yourself to see if you like it!
--- vim.o.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode, can be useful for resizing splits for example!
 vim.o.mouse = 'a'
@@ -150,7 +150,7 @@ vim.o.splitbelow = true
 --   See `:help lua-options`
 --   and `:help lua-options-guide`
 vim.o.list = true
-vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
+-- vim.opt.listchars = { tab = '» ', trail = '·', nbsp = '␣' }
 
 -- Preview substitutions live, as you type!
 vim.o.inccommand = 'split'
@@ -165,7 +165,7 @@ vim.o.scrolloff = 10
 -- instead raise a dialog asking if you wish to save the current file(s)
 -- See `:help 'confirm'`
 vim.o.confirm = true
-
+vim.o.termguicolors = true
 -- [[ Basic Keymaps ]]
 --  See `:help vim.keymap.set()`
 
@@ -247,7 +247,12 @@ rtp:prepend(lazypath)
 -- NOTE: Here is where you install your plugins.
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
-  'NMAC427/guess-indent.nvim', -- Detect tabstop and shiftwidth automatically
+  'NMAC427/guess-indent.nvim',
+  {
+    'm4xshen/hardtime.nvim',
+    dependencies = { 'MunifTanjim/nui.nvim' },
+    opts = {},
+  }, -- Detect tabstop and shiftwidth automatically
 
   -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
@@ -773,6 +778,10 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         -- javascript = { "prettierd", "prettier", stop_after_first = true },
+        javascript = { 'prettierd' },
+        typescript = { 'prettierd' },
+        javascriptreact = { 'prettierd' },
+        typescriptreact = { 'prettierd' },
       },
     },
   },
@@ -890,11 +899,20 @@ require('lazy').setup({
           comments = { italic = false }, -- Disable italics in comments
         },
       }
-
+      -- Using Lazy
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
       vim.cmd.colorscheme 'tokyonight-night'
+    end,
+  },
+  { -- Theme 2: OneDark
+    'navarasu/onedark.nvim',
+    priority = 1000,
+    config = function()
+      require('onedark').setup {
+        style = 'dark', -- Using a valid style
+      }
     end,
   },
 
@@ -904,41 +922,73 @@ require('lazy').setup({
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
     config = function()
-      -- Better Around/Inside textobjects
-      --
-      -- Examples:
-      --  - va)  - [V]isually select [A]round [)]paren
-      --  - yinq - [Y]ank [I]nside [N]ext [Q]uote
-      --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      -- This is the setup for your starter page.
+      -- It is now complete and correctly closed.
+      require('mini.starter').setup {
+        items = {
+          function()
+            -- This new function is smarter about finding projects.
+            -- It defines a "project" as a directory containing a `.git` folder.
+            local project_items = {}
+            local processed_roots = {} -- Keep track of project roots we've already added
+            local max_items = 5
 
-      -- Add/delete/replace surroundings (brackets, quotes, etc.)
-      --
-      -- - saiw) - [S]urround [A]dd [I]nner [W]ord [)]Paren
-      -- - sd'   - [S]urround [D]elete [']quotes
-      -- - sr)'  - [S]urround [R]eplace [)] [']
+            local project_workspaces = {
+              vim.fn.expand '~Developer',
+              vim.fn.expand '~/projects',
+            }
+            for _, file in ipairs(vim.v.oldfiles or {}) do
+              if file and vim.fn.filereadable(file) == 1 then
+                local file_path = vim.fn.fnamemodify(file, ':p')
+
+                for _, workspace in ipairs(project_workspaces) do
+                  if string.find(file_path, workspace .. '/', 1, true) then
+                    local remaining_path = string.sub(file_path, #workspace + 2)
+                    local project_name = vim.split(remaining_path, '/')[1]
+
+                    if project_name then
+                      local project_root = workspace .. '/' .. project_name
+
+                      if not processed_roots[project_root] then
+                        processed_roots[project_root] = true
+                        table.insert(project_items, {
+                          name = ' ' .. project_name,
+                          action = function()
+                            vim.cmd('cd ' .. project_root)
+                            vim.cmd 'Neotree'
+                          end,
+                          section = 'Recent Projects',
+                        })
+                      end
+                    end
+                    break
+                  end
+                end
+              end
+
+              if #project_items >= max_items then
+                break
+              end
+            end
+            return project_items
+          end,
+          require('mini.starter').sections.builtin_top,
+        },
+      }
+
+      -- These are the OTHER mini modules. They go AFTER the starter setup.
+      require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
 
-      -- Simple and easy statusline.
-      --  You could remove this setup call if you don't like it,
-      --  and try some other statusline plugin
+      -- This is the setup for the statusline
       local statusline = require 'mini.statusline'
-      -- set use_icons to true if you have a Nerd Font
       statusline.setup { use_icons = vim.g.have_nerd_font }
-
-      -- You can configure sections in the statusline by overriding their
-      -- default behavior. For example, here we set the section for
-      -- cursor location to LINE:COLUMN
-      ---@diagnostic disable-next-line: duplicate-set-field
       statusline.section_location = function()
         return '%2l:%-2v'
       end
-
-      -- ... and there is more!
-      --  Check out: https://github.com/echasnovski/mini.nvim
     end,
   },
-  { -- Highlight, edit, and navigate code
+  {
     'nvim-treesitter/nvim-treesitter',
     build = ':TSUpdate',
     main = 'nvim-treesitter.configs', -- Sets main module to use for opts
@@ -973,12 +1023,12 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
-  -- require 'kickstart.plugins.indent_line',
-  -- require 'kickstart.plugins.lint',
-  -- require 'kickstart.plugins.autopairs',
-  -- require 'kickstart.plugins.neo-tree',
-  -- require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
+  require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.indent_line',
+  require 'kickstart.plugins.lint',
+  require 'kickstart.plugins.autopairs',
+  require 'kickstart.plugins.neo-tree',
+  require 'kickstart.plugins.gitsigns', -- adds gitsigns recommend keymaps
 
   -- NOTE: The import below can automatically add your own plugins, configuration, etc from `lua/custom/plugins/*.lua`
   --    This is the easiest way to modularize your config.
