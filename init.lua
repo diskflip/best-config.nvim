@@ -252,9 +252,22 @@ require('lazy').setup({
     'm4xshen/hardtime.nvim',
     dependencies = { 'MunifTanjim/nui.nvim' },
     opts = {},
-  }, -- Detect tabstop and shiftwidth automatically
+  }, 
 
-  -- NOTE: Plugins can also be added by using a table,
+
+  { -- Statusline: Lualine
+   'nvim-lualine/lualine.nvim',
+   dependencies = { 'nvim-tree/nvim-web-devicons' },
+   config = function()
+     require('lualine').setup({
+       options = {
+         theme = 'palenight',
+         component_separators = '|',
+         section_separators = '', 
+       },
+    })
+  end,
+  },  -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
   --
@@ -288,7 +301,6 @@ require('lazy').setup({
       },
     },
   },
-
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
   -- This is often very useful to both group configuration, as well as handle
@@ -885,10 +897,33 @@ require('lazy').setup({
     },
   },
 
-  { -- You can easily change to a different colorscheme.
+   -- You can easily change to a different colorscheme.
     -- Change the name of the colorscheme plugin below, and then
     -- change the command in the config to whatever the name of that colorscheme is.
-    --
+    { -- Theme: Catppuccin
+      'catppuccin/nvim',
+      name = 'catppuccin',
+      priority = 1000, -- Make sure this loads first
+      config = function()
+        require('catppuccin').setup {
+          flavour = 'frappe',
+          integrations = {
+            cmp = true,
+            gitsigns = true,
+            nvimtree = true,
+            treesitter = true,
+            notify = false,
+            mini = {
+              enabled = true,
+              indentscope_color = '',
+            },
+          },
+        }
+        -- This command loads the colorscheme and makes it the default
+        vim.cmd.colorscheme 'catppuccin'
+      end,
+    },
+    {
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
@@ -903,7 +938,7 @@ require('lazy').setup({
       -- Load the colorscheme here.
       -- Like many other themes, this one has different styles, and you could load
       -- any other, such as 'tokyonight-storm', 'tokyonight-moon', or 'tokyonight-day'.
-      vim.cmd.colorscheme 'tokyonight-night'
+      -- vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
   { -- Theme 2: OneDark
@@ -913,6 +948,14 @@ require('lazy').setup({
       require('onedark').setup {
         style = 'dark', -- Using a valid style
       }
+      -- vim.cmd.colorscheme 'onedark'
+    end,
+  },
+  { -- Theme 3: Nightfox
+    'EdenEast/nightfox.nvim',
+    priority = 1000,
+    config = function()
+      -- vim.cmd.colorscheme 'nightfox'
     end,
   },
 
@@ -921,6 +964,7 @@ require('lazy').setup({
 
   { -- Collection of various small independent plugins/modules
     'echasnovski/mini.nvim',
+    dependencies = { 'catppuccin/nvim' },
     config = function()
       -- This is the setup for your starter page.
       -- It is now complete and correctly closed.
@@ -979,13 +1023,6 @@ require('lazy').setup({
       -- These are the OTHER mini modules. They go AFTER the starter setup.
       require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
-
-      -- This is the setup for the statusline
-      local statusline = require 'mini.statusline'
-      statusline.setup { use_icons = vim.g.have_nerd_font }
-      statusline.section_location = function()
-        return '%2l:%-2v'
-      end
     end,
   },
   {
