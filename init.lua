@@ -248,26 +248,20 @@ rtp:prepend(lazypath)
 require('lazy').setup({
   -- NOTE: Plugins can be added with a link (or for a github repo: 'owner/repo' link).
   'NMAC427/guess-indent.nvim',
-  {
-    'm4xshen/hardtime.nvim',
-    dependencies = { 'MunifTanjim/nui.nvim' },
-    opts = {},
-  }, 
-
 
   { -- Statusline: Lualine
-   'nvim-lualine/lualine.nvim',
-   dependencies = { 'nvim-tree/nvim-web-devicons' },
-   config = function()
-     require('lualine').setup({
-       options = {
-         theme = 'palenight',
-         component_separators = '|',
-         section_separators = '', 
-       },
-    })
-  end,
-  },  -- NOTE: Plugins can also be added by using a table,
+    'nvim-lualine/lualine.nvim',
+    dependencies = { 'nvim-tree/nvim-web-devicons' },
+    config = function()
+      require('lualine').setup {
+        options = {
+          theme = 'onenord',
+          component_separators = '|',
+          section_separators = '',
+        },
+      }
+    end,
+  }, -- NOTE: Plugins can also be added by using a table,
   -- with the first argument being the link and the following
   -- keys can be used to configure plugin behavior/loading/etc.
   --
@@ -300,6 +294,15 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+  },
+  {
+    'rachartier/tiny-inline-diagnostic.nvim',
+    event = 'VeryLazy', -- Or `LspAttach`
+    priority = 1000, -- needs to be loaded in first
+    config = function()
+      require('tiny-inline-diagnostic').setup()
+      vim.diagnostic.config { virtual_text = false } -- Only if needed in your configuration, if you already have native LSP diagnostics
+    end,
   },
   -- NOTE: Plugins can also be configured to run Lua code when they are loaded.
   --
@@ -690,7 +693,7 @@ require('lazy').setup({
       local servers = {
         -- clangd = {},
         -- gopls = {},
-        -- pyright = {},
+        pyright = {},
         -- rust_analyzer = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
@@ -711,7 +714,7 @@ require('lazy').setup({
                 callSnippet = 'Replace',
               },
               -- You can toggle below to ignore Lua_LS's noisy `missing-fields` warnings
-              -- diagnostics = { disable = { 'missing-fields' } },
+              diagnostics = { disable = { 'missing-fields' } },
             },
           },
         },
@@ -897,33 +900,76 @@ require('lazy').setup({
     },
   },
 
-   -- You can easily change to a different colorscheme.
-    -- Change the name of the colorscheme plugin below, and then
-    -- change the command in the config to whatever the name of that colorscheme is.
-    { -- Theme: Catppuccin
-      'catppuccin/nvim',
-      name = 'catppuccin',
-      priority = 1000, -- Make sure this loads first
-      config = function()
-        require('catppuccin').setup {
-          flavour = 'frappe',
-          integrations = {
-            cmp = true,
-            gitsigns = true,
-            nvimtree = true,
-            treesitter = true,
-            notify = false,
-            mini = {
-              enabled = true,
-              indentscope_color = '',
-            },
+  -- You can easily change to a different colorscheme.
+  -- Change the name of the colorscheme plugin below, and then
+  -- change the command in the config to whatever the name of that colorscheme is.
+  { -- Theme: Catppuccin
+    'catppuccin/nvim',
+    name = 'catppuccin',
+    priority = 1000, -- Make sure this loads first
+    config = function()
+      require('catppuccin').setup {
+        flavour = 'frappe',
+        integrations = {
+          cmp = true,
+          gitsigns = true,
+          nvimtree = true,
+          treesitter = true,
+          notify = false,
+          mini = {
+            enabled = true,
+            indentscope_color = '',
           },
-        }
-        -- This command loads the colorscheme and makes it the default
-        vim.cmd.colorscheme 'catppuccin'
-      end,
-    },
-    {
+        },
+      }
+      -- This command loads the colorscheme and makes it the default
+      -- vim.cmd.colorscheme 'catppuccin'
+    end,
+  },
+  {
+    'sainnhe/everforest',
+    name = 'everforest',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.g.everforest_enable_italic = true
+      vim.g.everforest_background = 'hard'
+      -- vim.cmd.colorscheme 'everforest'
+    end,
+  },
+  {
+    'rebelot/kanagawa.nvim',
+    name = 'kanagawa',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- vim.cmd.colorscheme 'kanagawa'
+    end,
+  },
+  {
+    'rmehri01/onenord.nvim',
+    name = 'onenord',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme 'onenord'
+    end,
+  },
+  {
+    'sainnhe/gruvbox-material',
+    lazy = false,
+    priority = 1000,
+    config = function()
+      -- Optionally configure and load the colorscheme
+      -- directly inside the plugin declaration.
+      vim.g.gruvbox_material_enable_italic = true
+      vim.g.gruvbox_material_background = 'hard'
+      -- vim.cmd.colorscheme 'gruvbox-material'
+    end,
+  },
+  {
     -- If you want to see what colorschemes are already installed, you can use `:Telescope colorscheme`.
     'folke/tokyonight.nvim',
     priority = 1000, -- Make sure to load this before all the other start plugins.
@@ -941,6 +987,31 @@ require('lazy').setup({
       -- vim.cmd.colorscheme 'tokyonight-night'
     end,
   },
+  {
+    'uloco/bluloco.nvim',
+    name = 'bluloco',
+    lazy = false,
+    priority = 1000,
+    dependencies = { 'rktjmp/lush.nvim' },
+    config = function()
+      -- your optional config goes here, see below.
+    end,
+  },
+  {
+    'bluz71/vim-moonfly-colors',
+    name = 'moonfly',
+    lazy = false,
+    priority = 1000,
+    config = function() end,
+  },
+  {
+    'bluz71/vim-nightfly-colors',
+    name = 'nightfly',
+    lazy = false,
+    priority = 1000,
+    config = function() end,
+  },
+
   { -- Theme 2: OneDark
     'navarasu/onedark.nvim',
     priority = 1000,
@@ -1024,6 +1095,31 @@ require('lazy').setup({
       require('mini.ai').setup { n_lines = 500 }
       require('mini.surround').setup()
     end,
+  },
+  { -- TypeScript Tools Plugin (replaces ts_ls)
+    'pmizio/typescript-tools.nvim',
+    dependencies = { 'nvim-lua/plenary.nvim', 'neovim/nvim-lspconfig' },
+    opts = {
+      -- Use a separate server for diagnostics to improve performance
+      separate_diagnostic_server = true,
+      settings = {
+        -- Expose extra actions for the Code Action menu
+        expose_as_code_action = {
+          'add_missing_imports',
+          'remove_unused_imports',
+          'organize_imports',
+        },
+        -- Help the server resolve path aliases like @/*
+        tsserver_file_preferences = {
+          importModuleSpecifierPreference = 'non-relative',
+        },
+        -- Automatically close JSX tags
+        jsx_close_tag = {
+          enable = true,
+          filetypes = { 'javascriptreact', 'typescriptreact' },
+        },
+      },
+    },
   },
   {
     'nvim-treesitter/nvim-treesitter',
