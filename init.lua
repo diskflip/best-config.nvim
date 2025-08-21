@@ -238,6 +238,7 @@ require('lazy').setup({
     config = function()
       require('lualine').setup {
         options = {
+          theme = 'palenight',
           component_separators = '|',
           section_separators = '',
         },
@@ -271,6 +272,9 @@ require('lazy').setup({
         changedelete = { text = '~' },
       },
     },
+  },
+  {
+    'rktjmp/lush.nvim',
   },
   {
     'rachartier/tiny-inline-diagnostic.nvim',
@@ -715,6 +719,7 @@ require('lazy').setup({
     config = function()
       vim.g.gruvbox_material_enable_italic = true
       vim.g.gruvbox_material_background = 'hard'
+      vim.o.background = 'dark'
     end,
   },
   {
@@ -724,13 +729,21 @@ require('lazy').setup({
       ---@diagnostic disable-next-line: missing-fields
       require('tokyonight').setup {
         style = 'night',
-        transparent = true,
+        transparent = false,
         styles = {
           keywords = { italic = true },
           comments = { italic = true },
         },
       }
+      -- vim.cmd.colorscheme 'tokyonight'
     end,
+  },
+
+  {
+    dir = '~/Developer/osrs.nvim', -- Or the full path to your project
+    name = 'osrs',
+    lazy = false,
+    priority = 1000,
   },
 
   { 'Mofiqul/dracula.nvim', name = 'dracula', lazy = false, priority = 1000, config = function() end },
@@ -771,8 +784,9 @@ require('lazy').setup({
     priority = 1000,
     config = function()
       require('onedark').setup {
-        style = 'dark', -- Using a valid style
+        style = 'darker',
       }
+      vim.cmd.colorscheme 'onedark'
     end,
   },
   { -- Theme 3: Nightfox
